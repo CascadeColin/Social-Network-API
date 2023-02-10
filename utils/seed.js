@@ -10,8 +10,8 @@ connection.once("open", async () => {
   console.info(`Connected to ${db}`);
 
   // clear out DB
-  //   await User.deleteMany({});
-  //   await Thought.deleteMany({});
+  await User.deleteMany({});
+  // await Thought.deleteMany({});
 
   // TODO: functions for data handling
 
@@ -26,17 +26,17 @@ connection.once("open", async () => {
       username: userObj.username,
       email: userObj.email,
     });
-  } while (i < 21);
+  } while (i < 20);
 
   const thoughts = [];
 
   // seed DB
-  //   await User.collection.insertMany(users);
-  //   await Thought.collection.insertMany(thoughts);
+  await User.collection.insertMany(users);
+  // await Thought.collection.insertMany(thoughts);
 
   // console generated data and kill node
   console.table(users);
-  console.table(thoughts);
+  // console.table(thoughts);
   console.info(`Seeding of ${db} complete!`);
   process.exit(0);
 });
