@@ -9,7 +9,7 @@ const userSchema = new Schema(
       required: true,
       unique: true,
       validate: {
-        validator: validateEmail(),
+        validator: validateEmail,
         message: "Please enter a valid email address",
       },
     },
