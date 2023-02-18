@@ -22,9 +22,15 @@ module.exports = {
     }
   },
   // POST a new user:
-  //TEST:
   async createUser(req, res) {
     try {
+      const users = await User.find();
+      // verify that it is a unique username
+      users.forEach((user) => {
+        if ((user.username = req.body.username)) {
+          res.status(403).json({ message: "User already exists!" });
+        }
+      });
       const newUser = User.create(req.body);
       res.status(200).json(newUser);
     } catch (err) {
@@ -32,10 +38,9 @@ module.exports = {
     }
   },
   // PUT to update a user by its _id
-  // TEST:
   async updateUserById(req, res) {
     try {
-      const updateUser = User.findOneAndUpdate(
+      const updateUser = await User.findOneAndUpdate(
         { _id: req.params.userId },
         { $set: req.body },
         { runValidators: true, new: true }
@@ -46,13 +51,18 @@ module.exports = {
         res.status(404).json({ message: "User not found by that ID!" });
       }
     } catch (err) {
+      console.log(err);
       res.status(500).json(err);
     }
   },
   // DELETE to remove user by its _id
-  // BONUS: Remove a user's associated thoughts when deleted.
+  // TODO: Remove a user's associated thoughts when deleted.
   async deleteUserById(req, res) {
     try {
+      const deleteUser = await User.findOneAndRemove({
+        _id: req.params.userId,
+      });
+      res.status(200).json({ message: "User successfully deleted!" });
     } catch (err) {
       res.status(500).json(err);
     }
@@ -60,6 +70,26 @@ module.exports = {
   // POST to add a new friend to a user's friend list
   async createUserFriend(req, res) {
     try {
+      const userObj = await User.find({
+        _id: req.params.userId,
+      });
+      const friendObj = await User.find({
+        _id: req.params.friendId,
+      });
+      // add friend to user's friend list if the params are valid
+      if (userObj && friendObj) {
+        const update = await User.findOneAndUpdate(
+          {
+            _id: req.params.userId,
+          },
+          {
+            $push: { friends: friendObj },
+          }
+        );
+        res.status(200).json(update);
+      } else {
+        res.status(403).json({ message: "Check the user IDs and try again!" });
+      }
     } catch (err) {
       res.status(500).json(err);
     }
@@ -67,6 +97,26 @@ module.exports = {
   // DELETE to remove a friend from a user's friend list
   async deleteUserFriend(req, res) {
     try {
+      const userObj = await User.find({
+        _id: req.params.userId,
+      });
+      const friendObj = await User.find({
+        _id: req.params.friendId,
+      });
+      // add friend to user's friend list if the params are valid
+      if (userObj && friendObj) {
+        const update = await User.findOneAndUpdate(
+          {
+            _id: req.params.userId,
+          },
+          {
+            $pull: { friends: req.params.friendId },
+          }
+        );
+        res.status(200).json(update);
+      } else {
+        res.status(403).json({ message: "Check the user IDs and try again!" });
+      }
     } catch (err) {
       res.status(500).json(err);
     }
