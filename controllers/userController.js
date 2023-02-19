@@ -1,5 +1,16 @@
 const { User, Thought } = require("../models");
 
+// deletes user's thoughts and reactions when users are deleted
+const deleteUserData = async (id) => {
+  try {
+    await Thought.findOneAndRemove({ _id: id });
+    console.log(`Thought ${id} removed successfully`);
+    return;
+  } catch (err) {
+    return err;
+  }
+};
+
 module.exports = {
   // GET all users
   async getUsers(req, res) {
@@ -30,9 +41,9 @@ module.exports = {
     try {
       const newUser = await User.create(req.body);
       if (Object.keys(newUser).length > 0) {
-        res.status(200).json({message: "New user created successfully!"});
+        res.status(200).json({ message: "New user created successfully!" });
       } else {
-        res.status(400).json({message: "Failed to create new user object"})
+        res.status(400).json({ message: "Failed to create new user object" });
       }
     } catch (err) {
       res.status(500).json(err);
@@ -60,6 +71,16 @@ module.exports = {
   // TODO: Remove a user's associated thoughts when deleted.
   async deleteUserById(req, res) {
     try {
+      // returns array of user's thoughtId values
+      const userThoughts = (
+        await User.find({ _id: req.params.userId }).distinct("thoughts")
+      ).map((id) => id.toString());
+
+      // for each thought the user has, delete it
+      for (const data of userThoughts) {
+        deleteUserData(data, "Thought");
+      }
+
       const deleteUser = await User.findOneAndRemove({
         _id: req.params.userId,
       });

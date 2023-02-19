@@ -1,5 +1,4 @@
 const { User, Thought } = require("../models");
-const reactionSchema = require("../models/reaction");
 const { shuffle } = require("../utils/helpers");
 
 // generates a random user to attach to thoughts and reactions
