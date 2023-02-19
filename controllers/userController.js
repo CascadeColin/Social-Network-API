@@ -16,7 +16,11 @@ module.exports = {
       const user = await User.find({
         _id: req.params.userId,
       });
-      res.status(200).json(user);
+      if (!user.length) {
+        res.status(404).json({ message: "User not found!" });
+      } else {
+        res.status(200).json(user);
+      }
     } catch (err) {
       res.status(500).json(err);
     }
@@ -24,15 +28,12 @@ module.exports = {
   // POST a new user:
   async createUser(req, res) {
     try {
-      const users = await User.find();
-      // verify that it is a unique username
-      users.forEach((user) => {
-        if ((user.username = req.body.username)) {
-          res.status(403).json({ message: "User already exists!" });
-        }
-      });
-      const newUser = User.create(req.body);
-      res.status(200).json(newUser);
+      const newUser = await User.create(req.body);
+      if (Object.keys(newUser).length > 0) {
+        res.status(200).json({message: "New user created successfully!"});
+      } else {
+        res.status(400).json({message: "Failed to create new user object"})
+      }
     } catch (err) {
       res.status(500).json(err);
     }
@@ -70,21 +71,17 @@ module.exports = {
   // POST to add a new friend to a user's friend list
   async createUserFriend(req, res) {
     try {
-      const userObj = await User.find({
+      const user = await User.find({
         _id: req.params.userId,
       });
-      const friendObj = await User.find({
+      const friend = await User.find({
         _id: req.params.friendId,
       });
       // add friend to user's friend list if the params are valid
-      if (userObj && friendObj) {
+      if (user && friend) {
         const update = await User.findOneAndUpdate(
-          {
-            _id: req.params.userId,
-          },
-          {
-            $push: { friends: friendObj },
-          }
+          { _id: req.params.userId },
+          { $push: { friends: friend } }
         );
         res.status(200).json(update);
       } else {
@@ -106,12 +103,8 @@ module.exports = {
       // add friend to user's friend list if the params are valid
       if (userObj && friendObj) {
         const update = await User.findOneAndUpdate(
-          {
-            _id: req.params.userId,
-          },
-          {
-            $pull: { friends: req.params.friendId },
-          }
+          { _id: req.params.userId },
+          { $pull: { friends: req.params.friendId } }
         );
         res.status(200).json(update);
       } else {
