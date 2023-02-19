@@ -2,8 +2,8 @@
 
 const { createRandomUser } = require("./data");
 
-console.log(JSON.stringify(createRandomUser()));
-console.log(JSON.stringify(createRandomUser()));
-console.log(JSON.stringify(createRandomUser()));
-console.log(JSON.stringify(createRandomUser()));
-console.log(JSON.stringify(createRandomUser()));
+console.log(`\n${JSON.stringify(createRandomUser())}\n`);
+console.log(`${JSON.stringify(createRandomUser())}\n`);
+console.log(`${JSON.stringify(createRandomUser())}\n`);
+console.log(`${JSON.stringify(createRandomUser())}\n`);
+console.log(`${JSON.stringify(createRandomUser())}\n`);
